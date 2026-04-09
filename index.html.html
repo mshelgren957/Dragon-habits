@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#2D4A3E"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<title>Dragon Habits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --fd: #2D4A3E; --fm: #4A7C6F; --fl: #8FBC8B;
+  --ed: #8B3A2A; --em: #C4622D; --el: #E8956D;
+  --sd: #2A3F5F; --sm: #4A6FA5; --sl: #7FA8D4;
+  --cr: #FAF6F0; --ww: #FDF9F4; --pa: #F0E8D8;
+  --ink: #2C2416; --is: #5C4F3A;
+  --go: #C9943A; --gl: #E8C97A;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--cr);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 430px;
+  margin: 0 auto;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* SCREENS */
+.screen { display: none; flex-direction: column; height: 100%; width: 100%; overflow: hidden; }
+.screen.active { display: flex; }
+
+/* SKY */
+.sky {
+  background: linear-gradient(180deg, #C8E6F5 0%, #E8F4F8 45%, #F5EDD8 100%);
+  padding: 1.25rem 1rem 0.875rem;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.cloud { position: absolute; background: rgba(255,255,255,0.85); border-radius: 50px; filter: blur(2px); }
+.c1 { width: 70px; height: 20px; top: 18px; left: 8%; animation: drift 8s ease-in-out infinite; }
+.c2 { width: 100px; height: 28px; top: 38px; right: 12%; animation: drift 11s ease-in-out infinite reverse; }
+.c3 { width: 55px; height: 16px; top: 14px; left: 52%; animation: drift 9s ease-in-out infinite; }
+@keyframes drift { 0%,100%{transform:translateX(0)} 50%{transform:translateX(10px)} }
+.top-bar { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 2; }
+.app-title { font-family: 'Cinzel Decorative', serif; font-size: 20px; color: var(--fd); }
+.app-title.sm { font-size: 16px; }
+.app-sub { text-align: center; font-size: 12px; color: var(--is); margin-top: 3px; letter-spacing: 0.5px; }
+
+/* SCROLLABLE CONTENT */
+.scroll-content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 1rem; }
+.scroll-content::-webkit-scrollbar { display: none; }
+
+/* NAV BAR */
+.nav { display: flex; justify-content: space-around; padding: 0.625rem 0 0.75rem; border-top: 1px solid var(--pa); width: 100%; background: var(--ww); flex-shrink: 0; }
+.ni { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; opacity: 0.38; font-size: 10px; color: var(--is); font-weight: 700; transition: opacity 0.2s; }
+.ni.on { opacity: 1; color: var(--fd); }
+.ni-icon { font-size: 22px; }
+
+/* SECTION LABEL */
+.sec-lbl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--is); margin-bottom: 0.625rem; }
+
+/* CARDS */
+.card { background: var(--ww); border: 1.5px solid var(--pa); border-radius: 18px; padding: 1rem 1.125rem; margin-bottom: 0.75rem; transition: all 0.2s; }
+.card:hover { border-color: var(--gl); }
+
+/* BUTTONS */
+.btn-primary { background: var(--fd); color: var(--gl); border: none; border-radius: 16px; padding: 0.9rem 1rem; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; transition: all 0.25s; letter-spacing: 0.5px; }
+.btn-primary:hover { background: var(--fm); transform: translateY(-2px); }
+.btn-primary:disabled { opacity: 0.38; cursor: not-allowed; transform: none; }
+.btn-ghost { background: rgba(255,255,255,0.65); border: 1px solid rgba(255,255,255,0.9); border-radius: 12px; padding: 0.375rem 0.875rem; font-size: 12px; font-weight: 700; color: var(--fd); cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
+.btn-ghost:hover { background: rgba(255,255,255,0.95); }
+
+/* INPUTS */
+.cozy-input { width: 100%; background: var(--ww); border: 1.5px solid var(--pa); border-radius: 14px; padding: 0.8rem 1.125rem; font-family: 'Nunito', sans-serif; font-size: 16px; color: var(--ink); outline: none; transition: border-color 0.2s; text-align: center; }
+.cozy-input:focus { border-color: var(--go); }
+.cozy-input::placeholder { color: #B8A898; }
+
+/* ===== WELCOME SCREEN ===== */
+#welcome .sky { padding-bottom: 0.5rem; }
+.title-block { text-align: center; position: relative; z-index: 2; padding-bottom: 0.75rem; }
+.grass { width: 100%; height: 36px; background: linear-gradient(180deg, var(--fl) 0%, var(--fm) 100%); border-radius: 50% 50% 0 0 / 18px 18px 0 0; margin-top: auto; flex-shrink: 0; }
+
+/* EGGS */
+.egg-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 1.125rem; }
+.egg-card { flex: 1; max-width: 118px; background: var(--ww); border: 2px solid transparent; border-radius: 20px; padding: 0.875rem 0.625rem; text-align: center; cursor: pointer; transition: all 0.25s; position: relative; }
+.egg-card:hover { transform: translateY(-3px); }
+.egg-card.sel { border-color: var(--go); background: var(--pa); }
+.egg-svg { width: 60px; height: 76px; margin: 0 auto 0.375rem; display: block; }
+.egg-name { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+.egg-desc { font-size: 10px; color: var(--is); line-height: 1.4; }
+.sel-badge { position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; background: var(--go); border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 11px; color: white; font-weight: 700; }
+.egg-card.sel .sel-badge { display: flex; }
+
+/* ===== DRAGON SCREEN ===== */
+.dragon-stage { text-align: center; margin-bottom: 0.875rem; }
+.dragon-name-big { font-family: 'Cinzel Decorative', serif; font-size: 20px; color: var(--fd); margin-bottom: 2px; }
+.stage-lbl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--go); margin-bottom: 0.875rem; }
+.dragon-wrap { position: relative; display: inline-block; }
+.dragon-aura { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 110px; height: 110px; border-radius: 50%; opacity: 0.12; animation: pulse 4s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.15)} }
+.hoard-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 0.625rem; font-size: 11px; color: var(--is); font-weight: 600; }
+.gems { display: flex; gap: 3px; }
+.gem { width: 10px; height: 10px; border-radius: 2px; background: var(--pa); border: 1px solid var(--gl); }
+.gem.on { background: var(--go); border-color: var(--ed); }
+
+/* MOOD */
+.mood-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.875rem; }
+.mood-lbl { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--is); }
+.mood-dots { display: flex; gap: 6px; }
+.mood-dot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--pa); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 15px; background: var(--ww); }
+.mood-dot.on { border-color: var(--go); transform: scale(1.2); background: var(--pa); }
+
+/* CATEGORY CARDS */
+.cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cat-card { background: var(--ww); border: 1.5px solid var(--pa); border-radius: 16px; padding: 0.875rem 0.875rem 0.75rem; cursor: pointer; transition: all 0.2s; }
+.cat-card:hover { border-color: var(--gl); transform: translateY(-2px); }
+.cat-card-icon { font-size: 22px; margin-bottom: 3px; }
+.cat-card-name { font-size: 11px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.cat-card-unlock { font-size: 10px; color: var(--is); }
+.mini-bar { height: 3px; background: var(--pa); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+.mini-fill { height: 100%; border-radius: 4px; transition: width 0.4s; }
+
+/* ===== HABIT SCREEN ===== */
+.cat-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 0.5rem 1rem; flex-shrink: 0; scrollbar-width: none; }
+.cat-tabs::-webkit-scrollbar { display: none; }
+.tab { flex-shrink: 0; background: var(--ww); border: 1.5px solid var(--pa); border-radius: 20px; padding: 0.3rem 0.75rem; font-size: 11px; font-weight: 700; color: var(--is); cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
+.tab.active { background: var(--fd); color: var(--gl); border-color: var(--fd); }
+.cat-header { padding: 0.75rem 1rem 0.5rem; flex-shrink: 0; }
+.cat-hrow { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+.cat-big-icon { font-size: 22px; }
+.cat-hname { font-family: 'Cinzel Decorative', serif; font-size: 14px; }
+.unlock-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 10px; border-radius: 20px; margin-bottom: 0.5rem; }
+.prog-row { display: flex; align-items: center; gap: 8px; }
+.prog-bar { flex: 1; height: 5px; background: var(--pa); border-radius: 4px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+.prog-ct { font-size: 11px; font-weight: 700; color: var(--is); min-width: 30px; text-align: right; }
+.h-item { display: flex; align-items: center; gap: 10px; padding: 0.625rem 0.875rem; background: var(--ww); border: 1.5px solid var(--pa); border-radius: 12px; margin-bottom: 7px; cursor: pointer; transition: all 0.2s; user-select: none; }
+.h-item:active { transform: scale(0.98); }
+.h-item.done { background: var(--pa); border-color: var(--gl); }
+.h-box { width: 22px; height: 22px; border-radius: 7px; border: 2px solid #D4C5B0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: white; transition: all 0.2s; }
+.h-item.done .h-box { background: var(--go); border-color: var(--go); }
+.chk { display: none; font-size: 12px; color: white; font-weight: 700; }
+.h-item.done .chk { display: block; }
+.h-text { font-size: 13px; font-weight: 600; color: var(--ink); flex: 1; }
+.h-item.done .h-text { color: var(--is); text-decoration: line-through; text-decoration-color: var(--gl); }
+.spark { font-size: 11px; opacity: 0; transition: opacity 0.3s; }
+.h-item.done .spark { opacity: 1; }
+.add-btn { display: flex; align-items: center; gap: 8px; padding: 0.625rem 0.875rem; background: transparent; border: 1.5px dashed #D4C5B0; border-radius: 12px; margin-bottom: 7px; cursor: pointer; color: var(--is); font-size: 12px; font-weight: 700; font-family: 'Nunito', sans-serif; width: 100%; text-align: left; transition: all 0.2s; }
+.add-btn:hover { border-color: var(--gl); color: var(--ink); }
+.add-row { display: none; gap: 6px; margin-bottom: 7px; }
+.add-row.on { display: flex; }
+.add-field { flex: 1; background: var(--ww); border: 1.5px solid var(--gl); border-radius: 10px; padding: 0.5rem 0.875rem; font-family: 'Nunito', sans-serif; font-size: 13px; color: var(--ink); outline: none; }
+.add-save { background: var(--fd); color: var(--gl); border: none; border-radius: 10px; padding: 0 0.875rem; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; }
+.reward-strip { padding: 0.625rem 1rem 0; flex-shrink: 0; }
+.r-card { background: var(--ww); border: 1.5px solid var(--pa); border-radius: 14px; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px; }
+.r-icon { font-size: 26px; }
+.r-title { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--go); margin-bottom: 2px; }
+.r-msg { font-size: 12px; color: var(--is); line-height: 1.4; }
+
+/* ===== DEN SCREEN ===== */
+.den-stage { text-align: center; margin-bottom: 1rem; }
+.den-art { width: 100%; max-width: 300px; height: 200px; margin: 0 auto 0.75rem; display: block; border-radius: 16px; overflow: hidden; }
+.den-title { font-family: 'Cinzel Decorative', serif; font-size: 16px; color: var(--fd); margin-bottom: 4px; }
+.den-desc { font-size: 12px; color: var(--is); line-height: 1.5; }
+.den-progress { margin-top: 1rem; }
+.den-bar-lbl { display: flex; justify-content: space-between; font-size: 11px; color: var(--is); font-weight: 700; margin-bottom: 4px; }
+.den-bar { height: 8px; background: var(--pa); border-radius: 6px; overflow: hidden; }
+.den-fill { height: 100%; background: var(--go); border-radius: 6px; transition: width 0.6s ease; }
+
+/* ===== HOARD SCREEN ===== */
+.hoard-display { text-align: center; margin-bottom: 1rem; }
+.hoard-count { font-family: 'Cinzel Decorative', serif; font-size: 36px; color: var(--go); }
+.hoard-sub { font-size: 12px; color: var(--is); }
+.gem-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin-bottom: 1rem; }
+.gem-big { width: 100%; aspect-ratio: 1; border-radius: 4px; background: var(--pa); border: 1px solid var(--gl); transition: all 0.3s; }
+.gem-big.on { background: var(--go); border-color: var(--ed); animation: gemPop 0.4s ease; }
+@keyframes gemPop { 0%{transform:scale(0.7)} 80%{transform:scale(1.15)} 100%{transform:scale(1)} }
+.unlock-list { margin-top: 0.5rem; }
+.unlock-item { display: flex; align-items: center; gap: 10px; padding: 0.625rem 0; border-bottom: 1px solid var(--pa); }
+.unlock-icon { font-size: 20px; }
+.unlock-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+.unlock-need { font-size: 11px; color: var(--is); margin-top: 1px; }
+.unlock-badge { margin-left: auto; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+.badge-locked { background: var(--pa); color: var(--is); }
+.badge-unlocked { background: #EAF3DE; color: #3B6D11; }
+
+/* CELEBRATION */
+.cele-overlay { position: fixed; inset: 0; background: rgba(44,36,22,0.4); z-index: 200; display: none; align-items: center; justify-content: center; }
+.cele-overlay.show { display: flex; }
+.cele-box { background: var(--ww); border: 2px solid var(--go); border-radius: 24px; padding: 2rem 1.5rem; text-align: center; max-width: 280px; width: 88%; animation: popIn 0.35s ease; }
+@keyframes popIn { 0%{transform:scale(0.8);opacity:0} 100%{transform:scale(1);opacity:1} }
+.ce-icon { font-size: 44px; margin-bottom: 0.5rem; }
+.ce-title { font-family: 'Cinzel Decorative', serif; font-size: 15px; color: var(--fd); margin-bottom: 0.5rem; }
+.ce-msg { font-size: 13px; color: var(--is); margin-bottom: 1rem; line-height: 1.5; }
+.ce-btn { background: var(--fd); color: var(--gl); border: none; border-radius: 12px; padding: 0.625rem 1.5rem; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ===== WELCOME SCREEN ===== -->
+<div id="welcome" class="screen active">
+  <div class="sky" style="padding-bottom:0.5rem">
+    <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+    <div class="title-block">
+      <div class="app-title" style="font-size:28px">Dragon Habits</div>
+      <div class="app-sub">grow your dragon, grow yourself</div>
+    </div>
+  </div>
+  <div class="scroll-content" style="display:flex;flex-direction:column;gap:1rem">
+    <div>
+      <div class="sec-lbl" style="text-align:center">choose your egg</div>
+      <div class="egg-row">
+        <div class="egg-card" onclick="pickEgg(this,'forest')" id="egg-forest">
+          <div class="sel-badge">✓</div>
+          <svg class="egg-svg" viewBox="0 0 64 80">
+            <ellipse cx="32" cy="44" rx="26" ry="32" fill="#6B9E6B"/>
+            <ellipse cx="24" cy="30" rx="7" ry="4" fill="#8FBC8B" opacity="0.55"/>
+            <ellipse cx="40" cy="52" rx="5" ry="3" fill="#4A7C6F" opacity="0.45"/>
+            <ellipse cx="20" cy="52" rx="3" ry="2" fill="#4A7C6F" opacity="0.3"/>
+            <circle cx="38" cy="36" r="4" fill="#2D4A3E" opacity="0.15"/>
+          </svg>
+          <div class="egg-name" style="color:#2D4A3E">Earth</div>
+          <div class="egg-desc">grounded & nature-rooted</div>
+        </div>
+        <div class="egg-card" onclick="pickEgg(this,'ember')" id="egg-ember">
+          <div class="sel-badge">✓</div>
+          <svg class="egg-svg" viewBox="0 0 64 80">
+            <ellipse cx="32" cy="44" rx="26" ry="32" fill="#C4622D"/>
+            <ellipse cx="24" cy="32" rx="8" ry="5" fill="#E8956D" opacity="0.5"/>
+            <ellipse cx="38" cy="55" rx="5" ry="3" fill="#8B3A2A" opacity="0.45"/>
+            <ellipse cx="42" cy="36" rx="3" ry="4" fill="#8B3A2A" opacity="0.3"/>
+          </svg>
+          <div class="egg-name" style="color:#8B3A2A">Ember</div>
+          <div class="egg-desc">bold & full of spark</div>
+        </div>
+        <div class="egg-card" onclick="pickEgg(this,'storm')" id="egg-storm">
+          <div class="sel-badge">✓</div>
+          <svg class="egg-svg" viewBox="0 0 64 80">
+            <ellipse cx="32" cy="44" rx="26" ry="32" fill="#4A6FA5"/>
+            <ellipse cx="24" cy="32" rx="7" ry="4" fill="#7FA8D4" opacity="0.5"/>
+            <ellipse cx="40" cy="52" rx="5" ry="3" fill="#2A3F5F" opacity="0.45"/>
+            <circle cx="38" cy="34" r="2.5" fill="#7FA8D4" opacity="0.4"/>
+          </svg>
+          <div class="egg-name" style="color:#2A3F5F">Storm</div>
+          <div class="egg-desc">calm & introspective</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="sec-lbl" style="text-align:center">name your dragon</div>
+      <input class="cozy-input" id="dragon-input" type="text" placeholder="whisper a name..." maxlength="20" oninput="checkReady()"/>
+    </div>
+    <button class="btn-primary" id="hatch-btn" onclick="hatch()" disabled style="font-family:'Cinzel Decorative',serif">Begin the Hatching</button>
+  </div>
+  <div class="grass"></div>
+</div>
+
+<!-- ===== DRAGON SCREEN ===== -->
+<div id="dragon-screen" class="screen">
+  <div class="sky">
+    <div class="cloud c1"></div><div class="cloud c2"></div>
+    <div class="top-bar">
+      <div class="app-title sm">Dragon Habits</div>
+      <div style="font-size:11px;font-weight:700;color:var(--is)" id="day-label">Day 1</div>
+    </div>
+  </div>
+  <div class="scroll-content">
+    <div class="dragon-stage">
+      <div class="dragon-name-big" id="d-name">—</div>
+      <div class="stage-lbl" id="d-stage">hatchling</div>
+      <div class="dragon-wrap">
+        <div class="dragon-aura" id="d-aura" style="background:var(--fl)"></div>
+        <svg id="dragon-svg" width="110" height="130" viewBox="0 0 110 130">
+          <!-- body -->
+          <ellipse cx="55" cy="88" rx="30" ry="36" id="d-body" fill="#6B9E6B"/>
+          <!-- wings (locked) -->
+          <g id="d-wings" opacity="0.2">
+            <path d="M 28 70 Q 8 50 18 35 Q 26 52 30 65" fill="#4A7C6F"/>
+            <path d="M 82 70 Q 102 50 92 35 Q 84 52 80 65" fill="#4A7C6F"/>
+          </g>
+          <!-- head -->
+          <ellipse cx="55" cy="55" rx="22" ry="24" id="d-head" fill="#6B9E6B"/>
+          <!-- eye whites -->
+          <ellipse cx="47" cy="51" rx="5" ry="5.5" fill="#8FBC8B"/>
+          <ellipse cx="63" cy="51" rx="5" ry="5.5" fill="#8FBC8B"/>
+          <!-- pupils -->
+          <circle cx="47" cy="52" r="3" fill="#2C2416"/>
+          <circle cx="63" cy="52" r="3" fill="#2C2416"/>
+          <circle cx="48" cy="51" r="1" fill="white"/>
+          <circle cx="64" cy="51" r="1" fill="white"/>
+          <!-- nose -->
+          <ellipse cx="55" cy="62" rx="5" ry="3" fill="#8FBC8B" opacity="0.6"/>
+          <!-- horns -->
+          <path d="M 44 38 Q 38 26 42 22 Q 46 28 46 36" id="d-horn-l" fill="#4A7C6F"/>
+          <path d="M 66 38 Q 72 26 68 22 Q 64 28 64 36" id="d-horn-r" fill="#4A7C6F"/>
+          <!-- markings (locked) -->
+          <g id="d-markings" opacity="0">
+            <circle cx="55" cy="78" r="4" fill="#8FBC8B" opacity="0.5"/>
+            <circle cx="44" cy="90" r="3" fill="#8FBC8B" opacity="0.4"/>
+            <circle cx="66" cy="90" r="3" fill="#8FBC8B" opacity="0.4"/>
+          </g>
+          <!-- tail -->
+          <path d="M 55 120 Q 40 118 36 110 Q 38 105 44 108 Q 48 115 55 116" id="d-tail" fill="#4A7C6F"/>
+          <!-- shadow -->
+          <ellipse cx="55" cy="124" rx="20" ry="6" fill="#4A7C6F" opacity="0.2"/>
+        </svg>
+      </div>
+      <div class="hoard-row">
+        <span>hoard</span>
+        <div class="gems" id="hoard-gems-mini"></div>
+        <span id="hoard-mini-ct">0</span>
+      </div>
+    </div>
+
+    <div class="card" style="padding:0.75rem 1rem;margin-bottom:0.875rem">
+      <div class="mood-row">
+        <div class="mood-lbl">today's mood</div>
+        <div class="mood-dots" id="mood-dots">
+          <div class="mood-dot" onclick="setMood(0,'🌧','stormy','var(--sm)')" title="stormy">🌧</div>
+          <div class="mood-dot" onclick="setMood(1,'☁️','cloudy','var(--is)')" title="cloudy">☁️</div>
+          <div class="mood-dot on" onclick="setMood(2,'🌤','calm','var(--fm)')" title="calm">🌤</div>
+          <div class="mood-dot" onclick="setMood(3,'☀️','bright','var(--go)')" title="bright">☀️</div>
+          <div class="mood-dot" onclick="setMood(4,'✨','radiant','var(--fl)')" title="radiant">✨</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-lbl">today's habits</div>
+    <div class="cat-grid" id="cat-grid"></div>
+    <div style="height:0.5rem"></div>
+  </div>
+  <div class="nav">
+    <div class="ni on" onclick="goTo('dragon-screen',this)"><div class="ni-icon">🐉</div><span>Dragon</span></div>
+    <div class="ni" onclick="goTo('habit-screen',this)"><div class="ni-icon">📋</div><span>Habits</span></div>
+    <div class="ni" onclick="goTo('den-screen',this)"><div class="ni-icon">🏡</div><span>Den</span></div>
+    <div class="ni" onclick="goTo('hoard-screen',this)"><div class="ni-icon">💎</div><span>Hoard</span></div>
+  </div>
+</div>
+
+<!-- ===== HABIT SCREEN ===== -->
+<div id="habit-screen" class="screen">
+  <div class="sky" style="padding-bottom:0.625rem">
+    <div class="cloud c1"></div><div class="cloud c2"></div>
+    <div class="top-bar">
+      <button class="btn-ghost" onclick="goTo('dragon-screen',null)">← Dragon</button>
+      <div class="app-title sm">Habits</div>
+      <div style="width:70px"></div>
+    </div>
+  </div>
+  <div class="cat-tabs" id="cat-tabs"></div>
+  <div class="cat-header">
+    <div class="cat-hrow"><div class="cat-big-icon" id="h-icon">🌿</div><div class="cat-hname" id="h-name">Physical Health</div></div>
+    <div class="unlock-tag" id="h-tag">unlocks flying</div>
+    <div class="prog-row">
+      <div class="prog-bar"><div class="prog-fill" id="h-prog" style="width:0%"></div></div>
+      <div class="prog-ct" id="h-ct">0/10</div>
+    </div>
+  </div>
+  <div class="scroll-content" id="h-list" style="padding-top:0.5rem"></div>
+  <div class="reward-strip">
+    <div class="r-card">
+      <div class="r-icon" id="r-icon">🥚</div>
+      <div><div class="r-title" id="r-title">keep going</div><div class="r-msg" id="r-msg">Check a habit to earn dragon rewards</div></div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="ni" onclick="goTo('dragon-screen',this)"><div class="ni-icon">🐉</div><span>Dragon</span></div>
+    <div class="ni on" onclick="goTo('habit-screen',this)"><div class="ni-icon">📋</div><span>Habits</span></div>
+    <div class="ni" onclick="goTo('den-screen',this)"><div class="ni-icon">🏡</div><span>Den</span></div>
+    <div class="ni" onclick="goTo('hoard-screen',this)"><div class="ni-icon">💎</div><span>Hoard</span></div>
+  </div>
+</div>
+
+<!-- ===== DEN SCREEN ===== -->
+<div id="den-screen" class="screen">
+  <div class="sky">
+    <div class="cloud c1"></div><div class="cloud c2"></div>
+    <div class="top-bar">
+      <button class="btn-ghost" onclick="goTo('dragon-screen',null)">← Dragon</button>
+      <div class="app-title sm">The Den</div>
+      <div style="width:70px"></div>
+    </div>
+  </div>
+  <div class="scroll-content">
+    <div class="den-stage">
+      <svg class="den-art" viewBox="0 0 300 200" id="den-svg">
+        <!-- sky bg -->
+        <rect width="300" height="200" fill="#C8E6F5"/>
+        <!-- ground -->
+        <ellipse cx="150" cy="200" rx="180" ry="60" fill="#6B9E6B"/>
+        <!-- cave opening -->
+        <ellipse cx="150" cy="160" rx="70" ry="55" fill="#2D4A3E"/>
+        <ellipse cx="150" cy="155" rx="58" ry="46" fill="#1A2E28"/>
+        <!-- stage 1: basic cave -->
+        <g id="den-s1">
+          <circle cx="110" cy="140" r="6" fill="#C9943A" opacity="0.7"/>
+          <circle cx="190" cy="148" r="5" fill="#C9943A" opacity="0.6"/>
+        </g>
+        <!-- stage 2: cozy den (hidden) -->
+        <g id="den-s2" opacity="0">
+          <rect x="118" y="148" width="24" height="18" rx="2" fill="#C4622D"/>
+          <rect x="120" y="142" width="20" height="8" rx="2" fill="#E8956D"/>
+          <circle cx="165" cy="152" r="8" fill="#C9943A" opacity="0.8"/>
+          <circle cx="165" cy="152" r="5" fill="#E8C97A" opacity="0.7"/>
+        </g>
+        <!-- stage 3: full home (hidden) -->
+        <g id="den-s3" opacity="0">
+          <rect x="105" y="128" width="90" height="40" rx="4" fill="#4A7C6F" opacity="0.5"/>
+          <circle cx="150" cy="145" r="12" fill="#C9943A" opacity="0.9"/>
+          <circle cx="150" cy="145" r="8" fill="#E8C97A"/>
+        </g>
+        <!-- rocks -->
+        <ellipse cx="90" cy="175" rx="22" ry="14" fill="#4A7C6F"/>
+        <ellipse cx="215" cy="178" rx="18" ry="12" fill="#4A7C6F"/>
+        <!-- trees -->
+        <rect x="42" y="130" width="6" height="40" fill="#2D4A3E"/>
+        <ellipse cx="45" cy="125" rx="18" ry="22" fill="#4A7C6F"/>
+        <rect x="248" y="135" width="6" height="35" fill="#2D4A3E"/>
+        <ellipse cx="251" cy="128" rx="16" ry="20" fill="#6B9E6B"/>
+      </svg>
+      <div class="den-title" id="den-title">Empty Cave</div>
+      <div class="den-desc" id="den-desc">Complete Daily Living Skills habits to make your dragon's den cozier.</div>
+    </div>
+    <div class="den-progress card">
+      <div class="sec-lbl" style="margin-bottom:0.5rem">den progress</div>
+      <div class="den-bar-lbl"><span>Daily Living Skills</span><span id="den-pct">0%</span></div>
+      <div class="den-bar"><div class="den-fill" id="den-fill" style="width:0%"></div></div>
+      <div style="font-size:11px;color:var(--is);margin-top:8px;line-height:1.5" id="den-next-hint">Complete 3 daily living habits to unlock the Cozy Den stage.</div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="ni" onclick="goTo('dragon-screen',this)"><div class="ni-icon">🐉</div><span>Dragon</span></div>
+    <div class="ni" onclick="goTo('habit-screen',this)"><div class="ni-icon">📋</div><span>Habits</span></div>
+    <div class="ni on" onclick="goTo('den-screen',this)"><div class="ni-icon">🏡</div><span>Den</span></div>
+    <div class="ni" onclick="goTo('hoard-screen',this)"><div class="ni-icon">💎</div><span>Hoard</span></div>
+  </div>
+</div>
+
+<!-- ===== HOARD SCREEN ===== -->
+<div id="hoard-screen" class="screen">
+  <div class="sky">
+    <div class="cloud c1"></div><div class="cloud c2"></div>
+    <div class="top-bar">
+      <button class="btn-ghost" onclick="goTo('dragon-screen',null)">← Dragon</button>
+      <div class="app-title sm">The Hoard</div>
+      <div style="width:70px"></div>
+    </div>
+  </div>
+  <div class="scroll-content">
+    <div class="hoard-display card">
+      <div class="hoard-count" id="hoard-total">0</div>
+      <div class="hoard-sub">gems in the hoard</div>
+      <div style="font-size:11px;color:var(--is);margin-top:4px">earned by connecting with others</div>
+    </div>
+    <div class="sec-lbl">your gems</div>
+    <div class="gem-grid" id="gem-grid"></div>
+    <div class="sec-lbl">dragon unlocks</div>
+    <div class="unlock-list" id="unlock-list"></div>
+    <div style="height:1rem"></div>
+  </div>
+  <div class="nav">
+    <div class="ni" onclick="goTo('dragon-screen',this)"><div class="ni-icon">🐉</div><span>Dragon</span></div>
+    <div class="ni" onclick="goTo('habit-screen',this)"><div class="ni-icon">📋</div><span>Habits</span></div>
+    <div class="ni" onclick="goTo('den-screen',this)"><div class="ni-icon">🏡</div><span>Den</span></div>
+    <div class="ni on" onclick="goTo('hoard-screen',this)"><div class="ni-icon">💎</div><span>Hoard</span></div>
+  </div>
+</div>
+
+<!-- CELEBRATION -->
+<div class="cele-overlay" id="cele">
+  <div class="cele-box">
+    <div class="ce-icon" id="ce-icon">🐉</div>
+    <div class="ce-title" id="ce-title">Dragon Reward!</div>
+    <div class="ce-msg" id="ce-msg">You earned something wonderful.</div>
+    <button class="ce-btn" onclick="closeCele()">Lovely!</button>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const CATS = {
+  physical: {
+    icon:'🌿', name:'Physical Health', unlock:'unlocks flying',
+    tag:'background:#E8F4EC;color:#2D4A3E;', fill:'#4A7C6F',
+    ri:'🐉', rt:'wings growing', rm:"Your dragon stretches their wings!",
+    habits:['brush teeth','change clothes','eat 1 nutritious item','stretch','take a walk','jump 10x','rest','wash yourself','make a dr. appointment','drink water']
+  },
+  mental: {
+    icon:'🌸', name:'Mental Health & Gratitude', unlock:'unlocks color & markings',
+    tag:'background:#FAECE7;color:#8B3A2A;', fill:'#C4622D',
+    ri:'✨', rt:'glowing brighter', rm:"Your dragon shimmers with new color.",
+    habits:['name 1 thing I am grateful for','say "I choose to" instead of "I have to"','use kind words to yourself','name 1 thing I appreciate about myself','say 1 thing I did well today','allow myself to make mistakes today','take a break','enjoy a meal','smell something good','wear something you like']
+  },
+  sensory: {
+    icon:'✨', name:'Sensory Needs', unlock:'unlocks wardrobe items',
+    tag:'background:#EAF1F8;color:#2A3F5F;', fill:'#4A6FA5',
+    ri:'👒', rt:'new item unlocked', rm:"A cozy item appears for your dragon!",
+    habits:['shake','allow stimming','change the lights','use headphones','chew gum','take a sound bath','take a bubble bath','pet an animal','watch wildlife','watch ASMR']
+  },
+  daily: {
+    icon:'🏡', name:'Daily Living Skills', unlock:'unlocks den & neighborhood',
+    tag:'background:#FDF6E8;color:#854F0B;', fill:'#C9943A',
+    ri:'🏡', rt:"den getting cozier", rm:"Your dragon's home grows warmer.",
+    habits:['make the bed','declutter','pay a bill','do the dishes','wash the laundry','make a meal','make an appointment','take out the garbage','pick up bathroom']
+  },
+  connecting: {
+    icon:'🌻', name:'Connecting with Others', unlock:'unlocks treasure hoard',
+    tag:'background:#EAF3DE;color:#3B6D11;', fill:'#639922',
+    ri:'💎', rt:'treasure added', rm:"A gem drops into the hoard!",
+    habits:['care for a plant','care for pets','play with pets','call a friend','write someone','journal','go out with a person','go out to a crowded place','make a date','research group activities','attend a new event','smile at someone']
+  },
+  creative: {
+    icon:'🔥', name:'Creative', unlock:'unlocks fire breath',
+    tag:'background:#FAECE7;color:#8B3A2A;', fill:'#C4622D',
+    ri:'🔥', rt:'fire kindling', rm:"Your dragon breathes a tiny flame!",
+    habits:['play','bake','wander','write','color','talk to a friend','research preferred topic','use AI','dream']
+  }
+};
+
+const EGG_COLORS = {
+  forest:{ body:'#6B9E6B', head:'#6B9E6B', accent:'#4A7C6F', light:'#8FBC8B', aura:'#8FBC8B' },
+  ember:{ body:'#C4622D', head:'#C4622D', accent:'#8B3A2A', light:'#E8956D', aura:'#E8956D' },
+  storm:{ body:'#4A6FA5', head:'#4A6FA5', accent:'#2A3F5F', light:'#7FA8D4', aura:'#7FA8D4' }
+};
+
+const MOOD_COLORS = {
+  0:'#4A6FA5', 1:'#888780', 2:'#4A7C6F', 3:'#C9943A', 4:'#8FBC8B'
+};
+
+// ===== STATE =====
+let state = {
+  egg: null, dragonName: '', currentCat: 'physical',
+  checked: {}, custom: {}, customCount: {},
+  hoardCount: 0, mood: 2, dayCount: 1
+};
+
+Object.keys(CATS).forEach(k => {
+  state.checked[k] = {};
+  state.custom[k] = [];
+  state.customCount[k] = 0;
+});
+
+// ===== WELCOME =====
+function pickEgg(card, type) {
+  document.querySelectorAll('.egg-card').forEach(c => c.classList.remove('sel'));
+  card.classList.add('sel');
+  state.egg = type;
+  checkReady();
+}
+
+function checkReady() {
+  const name = document.getElementById('dragon-input').value.trim();
+  document.getElementById('hatch-btn').disabled = !(state.egg && name.length > 0);
+}
+
+function hatch() {
+  state.dragonName = document.getElementById('dragon-input').value.trim();
+  applyEggColors();
+  document.getElementById('d-name').textContent = state.dragonName;
+  document.getElementById('day-label').textContent = 'Day ' + state.dayCount;
+  buildCatGrid();
+  buildCatTabs();
+  renderHabitScreen('physical');
+  buildHoardScreen();
+  updateDenScreen();
+  updateMiniHoard();
+  goToScreen('dragon-screen');
+}
+
+function applyEggColors() {
+  if (!state.egg) return;
+  const c = EGG_COLORS[state.egg];
+  document.getElementById('d-body').setAttribute('fill', c.body);
+  document.getElementById('d-head').setAttribute('fill', c.head);
+  document.getElementById('d-horn-l').setAttribute('fill', c.accent);
+  document.getElementById('d-horn-r').setAttribute('fill', c.accent);
+  document.getElementById('d-tail').setAttribute('fill', c.accent);
+  document.getElementById('d-wings').querySelectorAll('path').forEach(p => p.setAttribute('fill', c.accent));
+  document.getElementById('d-aura').style.background = c.aura;
+}
+
+// ===== NAVIGATION =====
+function goToScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goTo(id, navItem) {
+  goToScreen(id);
+  if (id === 'habit-screen') renderHabitScreen(state.currentCat);
+  if (id === 'den-screen') updateDenScreen();
+  if (id === 'hoard-screen') buildHoardScreen();
+}
+
+// ===== MOOD =====
+function setMood(idx, icon, name, color) {
+  state.mood = idx;
+  document.querySelectorAll('.mood-dot').forEach((d,i) => d.classList.toggle('on', i===idx));
+  const c = EGG_COLORS[state.egg || 'forest'];
+  const moodMix = MOOD_COLORS[idx];
+  document.getElementById('d-head').style.filter = idx < 2 ? 'brightness(0.85)' : idx > 3 ? 'brightness(1.1) saturate(1.2)' : 'none';
+}
+
+// ===== CAT GRID (dragon screen) =====
+function buildCatGrid() {
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = '';
+  Object.entries(CATS).forEach(([key, cat]) => {
+    const all = [...cat.habits, ...state.custom[key]];
+    const done = Object.values(state.checked[key]).filter(Boolean).length;
+    const pct = all.length > 0 ? Math.round(done/all.length*100) : 0;
+    const d = document.createElement('div');
+    d.className = 'cat-card';
+    d.innerHTML = `<div class="cat-card-icon">${cat.icon}</div><div class="cat-card-name">${cat.name}</div><div class="cat-card-unlock">${cat.unlock}</div><div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${cat.fill}"></div></div>`;
+    d.onclick = () => { state.currentCat = key; goTo('habit-screen', null); };
+    grid.appendChild(d);
+  });
+}
+
+// ===== HABIT SCREEN =====
+function buildCatTabs() {
+  const tabs = document.getElementById('cat-tabs');
+  tabs.innerHTML = '';
+  Object.entries(CATS).forEach(([key, cat]) => {
+    const t = document.createElement('div');
+    t.className = 'tab' + (key === state.currentCat ? ' active' : '');
+    t.textContent = cat.icon + ' ' + cat.name.split(' ')[0];
+    t.onclick = () => { state.currentCat = key; switchTab(t, key); };
+    tabs.appendChild(t);
+  });
+}
+
+function switchTab(tab, key) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  state.currentCat = key;
+  renderHabitScreen(key);
+}
+
+function renderHabitScreen(key) {
+  const cat = CATS[key];
+  document.getElementById('h-icon').textContent = cat.icon;
+  document.getElementById('h-name').textContent = cat.name;
+  const tag = document.getElementById('h-tag');
+  tag.textContent = cat.unlock; tag.style.cssText = cat.tag;
+  updateProgress(key);
+  updateReward(key);
+  const list = document.getElementById('h-list');
+  list.innerHTML = '';
+  addSectionLabel(list, 'preset habits');
+  cat.habits.forEach(h => addHabitItem(list, key, h));
+  addSectionLabel(list, 'your habits');
+  (state.custom[key] || []).forEach(h => addHabitItem(list, key, h));
+  if ((state.customCount[key] || 0) < 3) {
+    const ar = document.createElement('div');
+    ar.className = 'add-row'; ar.id = 'ar-' + key;
+    ar.innerHTML = `<input class="add-field" id="af-${key}" placeholder="add your own..." maxlength="50"/><button class="add-save" onclick="saveCustom('${key}')">Add</button>`;
+    list.appendChild(ar);
+    const ab = document.createElement('button');
+    ab.className = 'add-btn'; ab.id = 'ab-' + key;
+    ab.textContent = `+ add custom habit (${3 - (state.customCount[key]||0)} left)`;
+    ab.onclick = () => { ar.classList.add('on'); ab.style.display = 'none'; document.getElementById('af-'+key).focus(); };
+    list.appendChild(ab);
+  }
+  const pad = document.createElement('div'); pad.style.height = '0.5rem'; list.appendChild(pad);
+}
+
+function addSectionLabel(parent, txt) {
+  const d = document.createElement('div'); d.className = 'sec-lbl'; d.textContent = txt; parent.appendChild(d);
+}
+
+function addHabitItem(parent, key, habit) {
+  const done = state.checked[key][habit] || false;
+  const d = document.createElement('div');
+  d.className = 'h-item' + (done ? ' done' : '');
+  d.innerHTML = `<div class="h-box"><span class="chk">✓</span></div><div class="h-text">${habit}</div><div class="spark">✦</div>`;
+  d.onclick = () => toggleHabit(key, habit, d);
+  parent.appendChild(d);
+}
+
+function toggleHabit(key, habit, item) {
+  const was = state.checked[key][habit] || false;
+  state.checked[key][habit] = !was;
+  item.classList.toggle('done');
+  updateProgress(key);
+  updateReward(key);
+  buildCatGrid();
+  if (!was) {
+    const cat = CATS[key];
+    const all = [...cat.habits, ...state.custom[key]];
+    const done = Object.values(state.checked[key]).filter(Boolean).length;
+    if (key === 'connecting') { state.hoardCount++; updateMiniHoard(); buildHoardScreen(); }
+    if (done === 3) showCele(cat.ri, 'Habit Streak!', `You completed 3 ${cat.name} habits. ${cat.rm}`);
+    else if (done === all.length) showCele('🐉', 'Category Complete!', `You honored every ${cat.name} habit today!`);
+    checkDragonUnlocks();
+    updateDenScreen();
+  }
+}
+
+function updateProgress(key) {
+  const cat = CATS[key];
+  const all = [...cat.habits, ...state.custom[key]];
+  const done = Object.values(state.checked[key]).filter(Boolean).length;
+  const pct = all.length > 0 ? Math.round(done/all.length*100) : 0;
+  document.getElementById('h-prog').style.width = pct + '%';
+  document.getElementById('h-prog').style.background = cat.fill;
+  document.getElementById('h-ct').textContent = done + '/' + all.length;
+}
+
+function updateReward(key) {
+  const cat = CATS[key];
+  const done = Object.values(state.checked[key]).filter(Boolean).length;
+  const ri = document.getElementById('r-icon');
+  const rt = document.getElementById('r-title');
+  const rm = document.getElementById('r-msg');
+  if (done === 0) { ri.textContent = '🥚'; rt.textContent = 'keep going'; rm.textContent = 'Check a habit to earn dragon rewards'; }
+  else if (done < 3) { ri.textContent = cat.ri; rt.textContent = 'good start'; rm.textContent = 'Your dragon notices you showing up.'; }
+  else if (done < 6) { ri.textContent = cat.ri; rt.textContent = cat.rt; rm.textContent = cat.rm; }
+  else { ri.textContent = '🐉'; rt.textContent = 'magnificent'; rm.textContent = 'Your dragon is so proud of you today.'; }
+}
+
+function saveCustom(key) {
+  const f = document.getElementById('af-' + key);
+  const v = f.value.trim(); if (!v) return;
+  state.custom[key].push(v);
+  state.customCount[key] = (state.customCount[key] || 0) + 1;
+  renderHabitScreen(key);
+}
+
+// ===== DRAGON UNLOCKS =====
+function checkDragonUnlocks() {
+  const physDone = Object.values(state.checked.physical).filter(Boolean).length;
+  const mentalDone = Object.values(state.checked.mental).filter(Boolean).length;
+  if (physDone >= 5) document.getElementById('d-wings').setAttribute('opacity','1');
+  if (mentalDone >= 3) document.getElementById('d-markings').setAttribute('opacity','1');
+  const totalDone = Object.values(state.checked).reduce((acc,cat) => acc + Object.values(cat).filter(Boolean).length, 0);
+  if (totalDone >= 10) { document.getElementById('d-stage').textContent = 'young dragon'; }
+  if (totalDone >= 25) { document.getElementById('d-stage').textContent = 'dragon'; }
+}
+
+// ===== MINI HOARD =====
+function updateMiniHoard() {
+  const gems = document.getElementById('hoard-gems-mini');
+  gems.innerHTML = '';
+  const show = Math.min(state.hoardCount, 8);
+  for (let i = 0; i < 8; i++) {
+    const g = document.createElement('div');
+    g.className = 'gem' + (i < show ? ' on' : '');
+    gems.appendChild(g);
+  }
+  document.getElementById('hoard-mini-ct').textContent = state.hoardCount;
+}
+
+// ===== DEN SCREEN =====
+function updateDenScreen() {
+  const dailyHabits = [...CATS.daily.habits, ...state.custom.daily];
+  const done = Object.values(state.checked.daily).filter(Boolean).length;
+  const total = dailyHabits.length;
+  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  document.getElementById('den-fill').style.width = pct + '%';
+  document.getElementById('den-pct').textContent = pct + '%';
+  const s1 = document.getElementById('den-s1');
+  const s2 = document.getElementById('den-s2');
+  const s3 = document.getElementById('den-s3');
+  const title = document.getElementById('den-title');
+  const desc = document.getElementById('den-desc');
+  const hint = document.getElementById('den-next-hint');
+  if (done >= 7) {
+    s1.setAttribute('opacity','0'); s2.setAttribute('opacity','0'); s3.setAttribute('opacity','1');
+    title.textContent = 'Cozy Dragon Home'; desc.textContent = "Your dragon's den is fully furnished and warm. A true home.";
+    hint.textContent = 'Den fully unlocked! Keep up your daily living habits.';
+  } else if (done >= 3) {
+    s1.setAttribute('opacity','0'); s2.setAttribute('opacity','1'); s3.setAttribute('opacity','0');
+    title.textContent = 'Cozy Den'; desc.textContent = 'Your dragon has a cozy corner with a little hearth.';
+    hint.textContent = 'Complete 7 daily living habits to unlock the Full Home stage.';
+  } else {
+    s1.setAttribute('opacity','1'); s2.setAttribute('opacity','0'); s3.setAttribute('opacity','0');
+    title.textContent = 'Empty Cave'; desc.textContent = "Complete Daily Living Skills habits to make your dragon's den cozier.";
+    hint.textContent = 'Complete 3 daily living habits to unlock the Cozy Den stage.';
+  }
+}
+
+// ===== HOARD SCREEN =====
+function buildHoardScreen() {
+  document.getElementById('hoard-total').textContent = state.hoardCount;
+  const grid = document.getElementById('gem-grid');
+  grid.innerHTML = '';
+  const total = Math.max(state.hoardCount + 8, 24);
+  for (let i = 0; i < total; i++) {
+    const g = document.createElement('div');
+    g.className = 'gem-big' + (i < state.hoardCount ? ' on' : '');
+    grid.appendChild(g);
+  }
+  const unlocks = [
+    { icon:'🐉', name:'Hatchling', need:0, desc:'Your dragon has hatched!' },
+    { icon:'✨', name:'Color Markings', need:5, desc:'Complete 5 Mental Health habits' },
+    { icon:'🪽', name:'Flight', need:10, desc:'Complete 5 Physical Health habits' },
+    { icon:'🔥', name:'Fire Breath', need:20, desc:'Complete 5 Creative habits' },
+    { icon:'🏡', name:'Cozy Den', need:3, desc:'Complete 3 Daily Living habits' },
+    { icon:'👒', name:'Wardrobe', need:15, desc:'Complete 5 Sensory Needs habits' },
+  ];
+  const ul = document.getElementById('unlock-list');
+  ul.innerHTML = '';
+  unlocks.forEach(u => {
+    const d = document.createElement('div');
+    d.className = 'unlock-item';
+    const unlocked = state.hoardCount >= u.need || u.need === 0;
+    d.innerHTML = `<div class="unlock-icon">${u.icon}</div><div><div class="unlock-name">${u.name}</div><div class="unlock-need">${u.desc}</div></div><div class="unlock-badge ${unlocked ? 'badge-unlocked' : 'badge-locked'}">${unlocked ? 'unlocked' : u.need + ' needed'}</div>`;
+    ul.appendChild(d);
+  });
+}
+
+// ===== CELEBRATION =====
+function showCele(icon, title, msg) {
+  document.getElementById('ce-icon').textContent = icon;
+  document.getElementById('ce-title').textContent = title;
+  document.getElementById('ce-msg').textContent = msg;
+  document.getElementById('cele').classList.add('show');
+}
+function closeCele() { document.getElementById('cele').classList.remove('show'); }
+
+// ===== INIT =====
+buildCatTabs();
+</script>
+</body>
+</html>
